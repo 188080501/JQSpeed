@@ -1,0 +1,3 @@
+[submodule "JQWeb"]
+	path = JQWeb
+	url = git@github.com:188080501/JQWeb.git
