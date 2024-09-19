@@ -37,7 +37,7 @@ void Helper::onDisconnected(QWebSocket *socket)
 
 void Helper::onTextMessageReceived(QWebSocket *socket, const QString &message)
 {
-    qDebug() << "text message received:" << socket << message.size();
+    // qDebug() << "text message received:" << socket << message.size();
 
     auto requestData = QJsonDocument::fromJson( message.toUtf8() ).object();
     if ( requestData.isEmpty() ) { return; }
@@ -49,13 +49,18 @@ void Helper::onTextMessageReceived(QWebSocket *socket, const QString &message)
     {
         QJsonObject replyData;
 
-        replyData[ "serverTime" ] = QDateTime::currentDateTime().toString( "yyyy-MM-dd hh:mm:ss.zzz" );
+        replyData[ "action" ]     = "ping";
+        replyData[ "serverTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
+        replyData[ "clientTime" ] = requestData.value( "clientTime" );
 
-        socket->sendTextMessage( QJsonDocument( replyData ).toJson() );
+        socket->sendTextMessage( QJsonDocument( replyData ).toJson( QJsonDocument::Compact ) );
     }
 }
 
 void Helper::onBinaryMessageReceived(QWebSocket *socket, const QByteArray &message)
 {
-    qDebug() << "binary message received:" << socket << message.size();
+    Q_UNUSED( socket );
+    Q_UNUSED( message );
+
+    // qDebug() << "binary message received:" << socket << message.size();
 }
