@@ -3,7 +3,7 @@
 
 // Qt lib import
 #include <QDebug>
-#include <QDateTime>
+#include <QWebSocket>
 
 class Helper: public QObject
 {
@@ -13,6 +13,9 @@ public:
     Helper() = default;
 
     virtual ~Helper() override = default;
+
+private:
+    QWebSocket socket_;
 };
 
 #endif//HELPER_H_
