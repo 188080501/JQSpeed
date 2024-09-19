@@ -48,10 +48,41 @@ void Helper::onTextMessageReceived(QWebSocket *socket, const QString &message)
     if ( action == "ping" )
     {
         QJsonObject replyData;
-
         replyData[ "action" ]     = "ping";
         replyData[ "serverTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
         replyData[ "clientTime" ] = requestData.value( "clientTime" );
+
+        socket->sendTextMessage( QJsonDocument( replyData ).toJson( QJsonDocument::Compact ) );
+    }
+    else if ( action == "downloadSpeedTest" )
+    {
+        const auto dataBlockSize = 4 * 1024 * 1024;
+        const auto sendCount     = 32;
+
+        // 生成空数据
+        QByteArray data;
+        data.resize( dataBlockSize );
+
+        for ( auto sendIndex = 0; sendIndex < sendCount; ++sendIndex )
+        {
+            socket->sendBinaryMessage( data );
+        }
+
+        QJsonObject replyData;
+        replyData[ "action" ]     = "downloadSpeedTest";
+        replyData[ "serverTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
+        replyData[ "clientTime" ] = requestData.value( "clientTime" );
+        replyData[ "byteCount" ]  = dataBlockSize * sendCount;
+
+        socket->sendTextMessage( QJsonDocument( replyData ).toJson( QJsonDocument::Compact ) );
+    }
+    else if ( action == "uploadSpeedTest" )
+    {
+        QJsonObject replyData;
+        replyData[ "action" ]     = "uploadSpeedTest";
+        replyData[ "serverTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
+        replyData[ "clientTime" ] = requestData.value( "clientTime" );
+        replyData[ "byteCount" ]  = requestData.value( "byteCount" );
 
         socket->sendTextMessage( QJsonDocument( replyData ).toJson( QJsonDocument::Compact ) );
     }

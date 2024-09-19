@@ -1,4 +1,5 @@
 ﻿import QtQuick
+import QtQuick.Controls
 import QtQuick.Window
 
 Window {
@@ -37,6 +38,51 @@ Window {
                 {
                     return "Latency: N/A";
                 }
+            }
+        }
+
+        Text {
+            width: 100
+            text: {
+                if ( Helper.isConnected && ( Helper.downloadSpeed >= 0 ) )
+                {
+                    return "Download: " + Helper.downloadSpeed.toFixed( 1 );
+                }
+                else
+                {
+                    return "Download: N/A";
+                }
+            }
+        }
+
+        Text {
+            width: 100
+            text: {
+                if ( Helper.isConnected && ( Helper.uploadSpeed >= 0 ) )
+                {
+                    return "Upload: " + Helper.uploadSpeed.toFixed( 1 );
+                }
+                else
+                {
+                    return "Upload: N/A";
+                }
+            }
+        }
+
+        Item {
+           width: 1
+           height: 10
+        }
+
+        Button {
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 100
+            height: 40
+            text: "Test"
+            enabled: Helper.isConnected && !Helper.isMeasuringSpeed
+
+            onClicked: {
+                Helper.startMeasureDownloadSpeed();
             }
         }
     }

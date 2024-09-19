@@ -29,6 +29,41 @@ Helper::Helper()
 #endif
 }
 
+void Helper::startMeasureDownloadSpeed()
+{
+    this->setIsMeasuringSpeed( true );
+
+    QJsonObject requestData;
+    requestData[ "action" ]     = "downloadSpeedTest";
+    requestData[ "clientTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
+
+    this->sendJsonTextMessage( requestData );
+}
+
+void Helper::startMeasureUploadSpeed()
+{
+    this->setIsMeasuringSpeed( true );
+
+    const auto dataBlockSize = 4 * 1024 * 1024;
+    const auto sendCount     = 8;
+
+    // 生成空数据
+    QByteArray data;
+    data.resize( dataBlockSize );
+
+    for ( auto sendIndex = 0; sendIndex < sendCount; ++sendIndex )
+    {
+        socket_.sendBinaryMessage( data );
+    }
+
+    QJsonObject replyData;
+    replyData[ "action" ]     = "uploadSpeedTest";
+    replyData[ "clientTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
+    replyData[ "byteCount" ]  = dataBlockSize * sendCount;
+
+    socket_.sendTextMessage( QJsonDocument( replyData ).toJson( QJsonDocument::Compact ) );
+}
+
 void Helper::onCheck()
 {
     if ( socket_.state() == QAbstractSocket::UnconnectedState )
@@ -37,11 +72,14 @@ void Helper::onCheck()
     }
     else if ( socket_.state() == QAbstractSocket::ConnectedState )
     {
-        QJsonObject requestData;
-        requestData[ "action" ]     = "ping";
-        requestData[ "clientTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
+        if ( !this->isMeasuringSpeed() )
+        {
+            QJsonObject requestData;
+            requestData[ "action" ]     = "ping";
+            requestData[ "clientTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
 
-        this->sendJsonTextMessage( requestData );
+            this->sendJsonTextMessage( requestData );
+        }
     }
 
     if ( socket_.state() == QAbstractSocket::ConnectedState )
@@ -90,9 +128,45 @@ void Helper::onTextMessageReceived(const QString &message)
 
         this->setLatency( latency );
     }
+    else if ( action == "downloadSpeedTest" )
+    {
+        const auto clientTime  = responseData.value( "clientTime" ).toString().toLongLong();
+        const auto currentTime = QDateTime::currentMSecsSinceEpoch();
+        const auto elapsedTime = currentTime - clientTime;
+
+        const auto byteCount     = responseData.value( "byteCount" ).toInt();
+        const auto mbitPerSecond = byteCount * 8.0f / 1000.0f / 1000.0f / ( elapsedTime / 1000.0 );
+
+        qDebug() << "download speed:" << mbitPerSecond;
+
+        this->setDownloadSpeed( mbitPerSecond );
+
+        QMetaObject::invokeMethod( this, "startMeasureUploadSpeed", Qt::QueuedConnection );
+    }
+    else if ( action == "uploadSpeedTest" )
+    {
+        const auto clientTime  = responseData.value( "clientTime" ).toString().toLongLong();
+        const auto currentTime = QDateTime::currentMSecsSinceEpoch();
+        const auto elapsedTime = currentTime - clientTime;
+
+        const auto byteCount     = responseData.value( "byteCount" ).toInt();
+        const auto mbitPerSecond = byteCount * 8.0f / 1000.0f / 1000.0f / ( elapsedTime / 1000.0 );
+
+        qDebug() << "upload speed:" << mbitPerSecond;
+
+        this->setUploadSpeed( mbitPerSecond );
+
+        this->setIsMeasuringSpeed( false );
+    }
+    else
+    {
+        // qDebug() << "unknown action:" << action;
+    }
 }
 
 void Helper::onBinaryMessageReceived(const QByteArray &message)
 {
-    qDebug() << "onBinaryMessageReceived:" << message.size();
+    Q_UNUSED( message );
+
+    // qDebug() << "onBinaryMessageReceived:" << message.size();
 }
