@@ -8,6 +8,7 @@
 
 // Project lib import
 #include "jqwebcommon.h"
+#include "config.h"
 
 // WASM lib import
 #ifdef Q_OS_WASM
@@ -18,8 +19,9 @@
 Helper::Helper()
 {
     connect( &checkTimer_, &QTimer::timeout, this, &Helper::onCheck );
-    checkTimer_.start( 1000 );
+    checkTimer_.start( 2000 );
 
+    connect( &socket_, &QWebSocket::connected, this, &Helper::onCheck );
     connect( &socket_, &QWebSocket::textMessageReceived, this, &Helper::onTextMessageReceived );
     connect( &socket_, &QWebSocket::binaryMessageReceived, this, &Helper::onBinaryMessageReceived );
 
@@ -40,6 +42,12 @@ Helper::Helper()
 void Helper::startMeasureDownloadSpeed()
 {
     this->setIsMeasuringSpeed( true );
+    this->setDownloadSpeed( -1.0f );
+    this->setDownloadSpeedTestProgress( 0.0f );
+    this->setUploadSpeed( -1.0f );
+    this->setUploadSpeedTestProgress( 0.0f );
+
+    binaryReceivedCounter_ = 0;
 
     QJsonObject requestData;
     requestData[ "action" ]     = "downloadSpeedTest";
@@ -51,15 +59,16 @@ void Helper::startMeasureDownloadSpeed()
 void Helper::startMeasureUploadSpeed()
 {
     this->setIsMeasuringSpeed( true );
+    this->setUploadSpeed( -1.0f );
+    this->setUploadSpeedTestProgress( 0.0f );
 
-    const auto dataBlockSize = 1 * 1024 * 1024;
-    const auto sendCount     = 25;
+    binaryReceivedCounter_ = 0;
 
     // 生成空数据
     QByteArray data;
-    data.resize( dataBlockSize );
+    data.resize( uploadTestBlockSize );
 
-    for ( auto sendIndex = 0; sendIndex < sendCount; ++sendIndex )
+    for ( auto sendIndex = 0; sendIndex < uploadTestBlockCount; ++sendIndex )
     {
         socket_.sendBinaryMessage( data );
     }
@@ -67,7 +76,7 @@ void Helper::startMeasureUploadSpeed()
     QJsonObject replyData;
     replyData[ "action" ]     = "uploadSpeedTest";
     replyData[ "clientTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
-    replyData[ "byteCount" ]  = dataBlockSize * sendCount;
+    replyData[ "byteCount" ]  = uploadTestBlockSize * uploadTestBlockCount;
 
     socket_.sendTextMessage( QJsonDocument( replyData ).toJson( QJsonDocument::Compact ) );
 }
@@ -76,7 +85,7 @@ void Helper::onCheck()
 {
     if ( socket_.state() == QAbstractSocket::UnconnectedState )
     {
-        socket_.open( QUrl( QString( "ws://%1:51889" ).arg( this->serverHost() ) ) );
+        socket_.open( QUrl( QString( "ws://%1:%2" ).arg( this->serverHost(), QString::number( defaultWebSocketPort ) ) ) );
     }
     else if ( socket_.state() == QAbstractSocket::ConnectedState )
     {
@@ -148,6 +157,7 @@ void Helper::onTextMessageReceived(const QString &message)
         qDebug().noquote() << "download test result: data" << byteCount << "bytes, elapsed:" << elapsedTime << "ms, speed:" << QString::number( mbitPerSecond, 'f', 1 ) << "Mbps";
 
         this->setDownloadSpeed( mbitPerSecond );
+        this->setDownloadSpeedTestProgress( 1.0f );
 
         QMetaObject::invokeMethod( this, "startMeasureUploadSpeed", Qt::QueuedConnection );
     }
@@ -163,8 +173,18 @@ void Helper::onTextMessageReceived(const QString &message)
         qDebug().noquote() << "upload test result: data" << byteCount << "bytes, elapsed:" << elapsedTime << "ms, speed:" << QString::number( mbitPerSecond, 'f', 1 ) << "Mbps";
 
         this->setUploadSpeed( mbitPerSecond );
+        this->setUploadSpeedTestProgress( 1.0f );
 
         this->setIsMeasuringSpeed( false );
+    }
+    else if ( action == "binaryReceivedConfirm" )
+    {
+        if ( this->isMeasuringSpeed() )
+        {
+            binaryReceivedCounter_ += responseData[ "messageSize" ].toInt();
+
+            this->setUploadSpeedTestProgress( binaryReceivedCounter_ / static_cast< float >( uploadTestBlockSize * uploadTestBlockCount ) );
+        }
     }
     else
     {
@@ -174,7 +194,10 @@ void Helper::onTextMessageReceived(const QString &message)
 
 void Helper::onBinaryMessageReceived(const QByteArray &message)
 {
-    Q_UNUSED( message );
+    if ( this->isMeasuringSpeed() )
+    {
+        binaryReceivedCounter_ += message.size();
 
-    // qDebug() << "onBinaryMessageReceived:" << message.size();
+        this->setDownloadSpeedTestProgress( binaryReceivedCounter_ / static_cast< float >( downloadTestBlockSize * downloadTestBlockCount ) );
+    }
 }

@@ -91,4 +91,36 @@ Window {
             }
         }
     }
+
+    Item {
+        id: progressColumn
+        anchors.bottom: parent.bottom
+        width: parent.width
+        height: 20
+
+        Item {
+            width: progressColumn.width * Math.max( 0, Helper.downloadSpeedTestProgress )
+            height: 10
+            clip: true
+
+            Image {
+                width: progressColumn.width
+                height: 10
+                source: "qrc:/images/Download.png"
+            }
+        }
+
+        Item {
+            y: 10
+            width: progressColumn.width * Math.max( 0, Helper.uploadSpeedTestProgress )
+            height: 10
+            clip: true
+
+            Image {
+                width: progressColumn.width
+                height: 10
+                source: "qrc:/images/Upload.png"
+            }
+        }
+    }
 }

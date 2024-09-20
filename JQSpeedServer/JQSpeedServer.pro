@@ -7,8 +7,12 @@ CONFIG += console
 
 include( $$PWD/../library/JQWeb/JQWebCommon/JQWebCommon.pri )
 
+INCLUDEPATH *= \
+    $$PWD/../JQSpeedClient/cpp
+
 HEADERS += \
-    $$PWD/cpp/helper.h
+    $$PWD/cpp/helper.h \
+    $$PWD/../JQSpeedClient/cpp/config.h
 
 SOURCES += \
     $$PWD/cpp/helper.cpp \

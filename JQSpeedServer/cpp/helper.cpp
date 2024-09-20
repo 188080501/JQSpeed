@@ -6,6 +6,9 @@
 #include <QJsonDocument>
 #include <QDateTime>
 
+// Project lib import
+#include "config.h"
+
 Helper::Helper():
     server_( "JQSpeed", QWebSocketServer::NonSecureMode )
 {
@@ -14,7 +17,7 @@ Helper::Helper():
 
 bool Helper::init()
 {
-    return server_.listen( QHostAddress::Any, 51889 );
+    return server_.listen( QHostAddress::Any, defaultWebSocketPort );
 }
 
 void Helper::onNewConnection()
@@ -56,14 +59,11 @@ void Helper::onTextMessageReceived(QWebSocket *socket, const QString &message)
     }
     else if ( action == "downloadSpeedTest" )
     {
-        const auto dataBlockSize = 1 * 1024 * 1024;
-        const auto sendCount     = 50;
-
         // 生成空数据
         QByteArray data;
-        data.resize( dataBlockSize );
+        data.resize( downloadTestBlockSize );
 
-        for ( auto sendIndex = 0; sendIndex < sendCount; ++sendIndex )
+        for ( auto sendIndex = 0; sendIndex < downloadTestBlockCount; ++sendIndex )
         {
             socket->sendBinaryMessage( data );
         }
@@ -72,7 +72,7 @@ void Helper::onTextMessageReceived(QWebSocket *socket, const QString &message)
         replyData[ "action" ]     = "downloadSpeedTest";
         replyData[ "serverTime" ] = QString::number( QDateTime::currentMSecsSinceEpoch() );
         replyData[ "clientTime" ] = requestData.value( "clientTime" );
-        replyData[ "byteCount" ]  = dataBlockSize * sendCount;
+        replyData[ "byteCount" ]  = downloadTestBlockSize * downloadTestBlockCount;
 
         socket->sendTextMessage( QJsonDocument( replyData ).toJson( QJsonDocument::Compact ) );
     }
@@ -90,8 +90,8 @@ void Helper::onTextMessageReceived(QWebSocket *socket, const QString &message)
 
 void Helper::onBinaryMessageReceived(QWebSocket *socket, const QByteArray &message)
 {
-    Q_UNUSED( socket );
-    Q_UNUSED( message );
-
-    // qDebug() << "binary message received:" << socket << message.size();
+    QJsonObject replyData;
+    replyData[ "action" ]      = "binaryReceivedConfirm";
+    replyData[ "messageSize" ] = message.size();
+    socket->sendTextMessage( QJsonDocument( replyData ).toJson( QJsonDocument::Compact ) );
 }
