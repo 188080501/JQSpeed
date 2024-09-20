@@ -3,7 +3,7 @@ TARGET = JQSpeed
 
 QT *= websockets
 
-include( $$PWD/../JQWeb/JQWebCommon/JQWebCommon.pri )
+include( $$PWD/../library/JQWeb/JQWebCommon/JQWebCommon.pri )
 
 HEADERS += \
     $$PWD/cpp/helper.h
