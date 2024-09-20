@@ -145,7 +145,7 @@ void Helper::onTextMessageReceived(const QString &message)
         const auto byteCount     = responseData.value( "byteCount" ).toInt();
         const auto mbitPerSecond = byteCount * 8.0f / 1000.0f / 1000.0f / ( elapsedTime / 1000.0 );
 
-        qDebug().noquote() << "download test result: byte count" << byteCount << ", elapsed:" << elapsedTime << ", speed:" << QString::number( mbitPerSecond, 'f', 1 );
+        qDebug().noquote() << "download test result: data" << byteCount << "bytes, elapsed:" << elapsedTime << "ms, speed:" << QString::number( mbitPerSecond, 'f', 1 ) << "Mbps";
 
         this->setDownloadSpeed( mbitPerSecond );
 
@@ -160,7 +160,7 @@ void Helper::onTextMessageReceived(const QString &message)
         const auto byteCount     = responseData.value( "byteCount" ).toInt();
         const auto mbitPerSecond = byteCount * 8.0f / 1000.0f / 1000.0f / ( elapsedTime / 1000.0 );
 
-        qDebug().noquote() << "upload test result: byte count" << byteCount << ", elapsed:" << elapsedTime << ", speed:" << QString::number( mbitPerSecond, 'f', 1 );
+        qDebug().noquote() << "upload test result: data" << byteCount << "bytes, elapsed:" << elapsedTime << "ms, speed:" << QString::number( mbitPerSecond, 'f', 1 ) << "Mbps";
 
         this->setUploadSpeed( mbitPerSecond );
 

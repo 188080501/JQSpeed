@@ -7,23 +7,26 @@ Window {
     width: 640
     height: 480
     visible: true
-    color: "#eaeaea"
+    color: "#131a24"
 
     Column {
         anchors.centerIn: parent
 
         Text {
             width: 100
+            color: "#ffffff"
             text: "Server: " + Helper.serverHost
         }
 
         Text {
             width: 100
+            color: "#ffffff"
             text: ( Helper.isConnected ) ? ( "Connected" ) : ( "Connecting" )
         }
 
         Text {
             width: 100
+            color: "#ffffff"
             text: {
                 if ( Helper.isConnected && ( Helper.latency >= 0 ) )
                 {
@@ -43,6 +46,7 @@ Window {
 
         Text {
             width: 100
+            color: "#ffffff"
             text: {
                 if ( Helper.isConnected && ( Helper.downloadSpeed >= 0 ) )
                 {
@@ -57,6 +61,7 @@ Window {
 
         Text {
             width: 100
+            color: "#ffffff"
             text: {
                 if ( Helper.isConnected && ( Helper.uploadSpeed >= 0 ) )
                 {

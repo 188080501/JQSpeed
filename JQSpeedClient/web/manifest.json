@@ -3,8 +3,8 @@
     "short_name": "JQSpeed",
     "start_url": "JQSpeed.html",
     "display": "standalone",
-    "background_color": "#eaeaea",
-    "theme_color": "#eaeaea",
+    "background_color": "#131a24",
+    "theme_color": "#131a24",
     "description": "Qt for WebAssembly JQSpeed",
     "icons": [{
       "src": "favicon.ico",
