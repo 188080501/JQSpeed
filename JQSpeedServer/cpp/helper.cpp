@@ -56,8 +56,8 @@ void Helper::onTextMessageReceived(QWebSocket *socket, const QString &message)
     }
     else if ( action == "downloadSpeedTest" )
     {
-        const auto dataBlockSize = 2 * 1024 * 1024;
-        const auto sendCount     = 32;
+        const auto dataBlockSize = 1 * 1024 * 1024;
+        const auto sendCount     = 50;
 
         // 生成空数据
         QByteArray data;

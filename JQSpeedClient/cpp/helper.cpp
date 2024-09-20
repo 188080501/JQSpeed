@@ -52,8 +52,8 @@ void Helper::startMeasureUploadSpeed()
 {
     this->setIsMeasuringSpeed( true );
 
-    const auto dataBlockSize = 2 * 1024 * 1024;
-    const auto sendCount     = 24;
+    const auto dataBlockSize = 1 * 1024 * 1024;
+    const auto sendCount     = 25;
 
     // 生成空数据
     QByteArray data;
