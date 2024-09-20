@@ -46,7 +46,7 @@ Window {
             text: {
                 if ( Helper.isConnected && ( Helper.downloadSpeed >= 0 ) )
                 {
-                    return "Download: " + Helper.downloadSpeed.toFixed( 1 );
+                    return "Download: " + Helper.downloadSpeed.toFixed( 1 ) + " Mbps";
                 }
                 else
                 {
@@ -60,7 +60,7 @@ Window {
             text: {
                 if ( Helper.isConnected && ( Helper.uploadSpeed >= 0 ) )
                 {
-                    return "Upload: " + Helper.uploadSpeed.toFixed( 1 );
+                    return "Upload: " + Helper.uploadSpeed.toFixed( 1 ) + " Mbps";
                 }
                 else
                 {

@@ -6,6 +6,9 @@
 #include <QJsonDocument>
 #include <QUrl>
 
+// Project lib import
+#include "jqwebcommon.h"
+
 // WASM lib import
 #ifdef Q_OS_WASM
 #   include <emscripten.h>
@@ -27,6 +30,11 @@ Helper::Helper()
 #else
     this->setServerHost( "127.0.0.1" );
 #endif
+
+    if ( const auto host = JQWebCommon::commandLineParser( "serverHost" ); !host.isEmpty() )
+    {
+        this->setServerHost( host );
+    }
 }
 
 void Helper::startMeasureDownloadSpeed()
@@ -44,8 +52,8 @@ void Helper::startMeasureUploadSpeed()
 {
     this->setIsMeasuringSpeed( true );
 
-    const auto dataBlockSize = 4 * 1024 * 1024;
-    const auto sendCount     = 8;
+    const auto dataBlockSize = 2 * 1024 * 1024;
+    const auto sendCount     = 24;
 
     // 生成空数据
     QByteArray data;
@@ -68,7 +76,7 @@ void Helper::onCheck()
 {
     if ( socket_.state() == QAbstractSocket::UnconnectedState )
     {
-        socket_.open( QUrl( QString( "ws://%1:51888" ).arg( this->serverHost() ) ) );
+        socket_.open( QUrl( QString( "ws://%1:51889" ).arg( this->serverHost() ) ) );
     }
     else if ( socket_.state() == QAbstractSocket::ConnectedState )
     {
@@ -137,7 +145,7 @@ void Helper::onTextMessageReceived(const QString &message)
         const auto byteCount     = responseData.value( "byteCount" ).toInt();
         const auto mbitPerSecond = byteCount * 8.0f / 1000.0f / 1000.0f / ( elapsedTime / 1000.0 );
 
-        qDebug() << "download speed:" << mbitPerSecond;
+        qDebug().noquote() << "download test result: byte count" << byteCount << ", elapsed:" << elapsedTime << ", speed:" << QString::number( mbitPerSecond, 'f', 1 );
 
         this->setDownloadSpeed( mbitPerSecond );
 
@@ -152,7 +160,7 @@ void Helper::onTextMessageReceived(const QString &message)
         const auto byteCount     = responseData.value( "byteCount" ).toInt();
         const auto mbitPerSecond = byteCount * 8.0f / 1000.0f / 1000.0f / ( elapsedTime / 1000.0 );
 
-        qDebug() << "upload speed:" << mbitPerSecond;
+        qDebug().noquote() << "upload test result: byte count" << byteCount << ", elapsed:" << elapsedTime << ", speed:" << QString::number( mbitPerSecond, 'f', 1 );
 
         this->setUploadSpeed( mbitPerSecond );
 

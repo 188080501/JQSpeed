@@ -14,7 +14,7 @@ Helper::Helper():
 
 bool Helper::init()
 {
-    return server_.listen( QHostAddress::Any, 51888 );
+    return server_.listen( QHostAddress::Any, 51889 );
 }
 
 void Helper::onNewConnection()
@@ -56,7 +56,7 @@ void Helper::onTextMessageReceived(QWebSocket *socket, const QString &message)
     }
     else if ( action == "downloadSpeedTest" )
     {
-        const auto dataBlockSize = 4 * 1024 * 1024;
+        const auto dataBlockSize = 2 * 1024 * 1024;
         const auto sendCount     = 32;
 
         // 生成空数据
