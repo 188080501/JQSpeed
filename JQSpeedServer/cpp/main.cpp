@@ -5,14 +5,13 @@
 #include <QQuickStyle>
 
 // Project lib import
-#include "jqwebcommon.h"
 #include "helper.h"
 
 int main(int argc, char **argv)
 {
-    QGuiApplication app( argc, argv );
+    QCoreApplication app( argc, argv );
 
-    JQWebCommon::init( &app );
+    qSetMessagePattern( "%{time hh:mm:ss.zzz}: %{message}" );
 
     Helper helper;
     if ( !helper.init() )
