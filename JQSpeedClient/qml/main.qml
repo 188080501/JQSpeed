@@ -15,7 +15,7 @@ Window {
         height: 85
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -120
+        anchors.verticalCenterOffset: -140
         color: "#00000000"
         border.width: 2
         border.color: ( Helper.isConnected ) ? ( "#4CAF50" ) : ( "#9E9E9E" )
@@ -33,8 +33,8 @@ Window {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 50
             color: serverHostContains.border.color
-            font.pixelSize: 13
-            text: ( Helper.isConnected ) ? ( "Connected" ) : ( "Connecting" )
+            font.pixelSize: 14
+            text: ( Helper.isConnected ) ? ( "已连接" ) : ( "连接中" )
         }
     }
 
@@ -42,26 +42,26 @@ Window {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: serverHostContains.bottom
         anchors.topMargin: 40
-        spacing: 15
+        spacing: 20
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.horizontalCenterOffset: 65
-            width: 220
+            width: 190
             color: "#ffffff"
             text: {
                 if ( Helper.isConnected && ( Helper.latency >= 0 ) )
                 {
                     if ( Helper.latency === 0 )
                     {
-                        return "Latency: <1 ms";
+                        return "延迟: <1 ms";
                     }
 
-                    return "Latency: " + Helper.latency + " ms";
+                    return "延迟: " + Helper.latency + " ms";
                 }
                 else
                 {
-                    return "Latency: N/A";
+                    return "延迟: N/A";
                 }
             }
 
@@ -75,22 +75,12 @@ Window {
 
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: 60
-            spacing: 15
+            anchors.horizontalCenterOffset: 10
+            spacing: 100
 
             Text {
-                width: 220
                 color: "#ffffff"
-                text: {
-                    if ( Helper.isConnected && ( Helper.downloadSpeed >= 0 ) )
-                    {
-                        return "Download: " + Helper.downloadSpeed.toFixed( 1 ) + " Mbps";
-                    }
-                    else
-                    {
-                        return "Download: N/A";
-                    }
-                }
+                text: "下载"
 
                 Image {
                     anchors.verticalCenter: parent.verticalCenter
@@ -98,21 +88,29 @@ Window {
                     anchors.rightMargin: 12
                     source: "qrc:/images/Download.png"
                 }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenterOffset: -20
+                    anchors.top: parent.bottom
+                    anchors.topMargin: 10
+                    color: "#ffffff"
+                    text: {
+                        if ( Helper.isConnected && ( Helper.downloadSpeed >= 0 ) )
+                        {
+                            return Helper.downloadSpeed.toFixed( 1 ) + " Mbps";
+                        }
+                        else
+                        {
+                            return "--";
+                        }
+                    }
+                }
             }
 
             Text {
-                width: 220
                 color: "#ffffff"
-                text: {
-                    if ( Helper.isConnected && ( Helper.uploadSpeed >= 0 ) )
-                    {
-                        return "Upload: " + Helper.uploadSpeed.toFixed( 1 ) + " Mbps";
-                    }
-                    else
-                    {
-                        return "Upload: N/A";
-                    }
-                }
+                text: "上传"
 
                 Image {
                     anchors.verticalCenter: parent.verticalCenter
@@ -120,12 +118,30 @@ Window {
                     anchors.rightMargin: 12
                     source: "qrc:/images/Upload.png"
                 }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenterOffset: -20
+                    anchors.top: parent.bottom
+                    anchors.topMargin: 10
+                    color: "#ffffff"
+                    text: {
+                        if ( Helper.isConnected && ( Helper.uploadSpeed >= 0 ) )
+                        {
+                            return Helper.uploadSpeed.toFixed( 1 ) + " Mbps";
+                        }
+                        else
+                        {
+                            return "--";
+                        }
+                    }
+                }
             }
         }
 
         Item {
            width: 1
-           height: 10
+           height: 30
         }
 
         MouseArea {
@@ -165,7 +181,7 @@ Window {
             Text {
                 anchors.centerIn: parent
                 color: ( Helper.isConnected ) ? ( "#ffffff" ) : ( "#9E9E9E" )
-                text: "Test"
+                text: ( Helper.isMeasuringSpeed ) ? ( "测试中" ) : ( "测试" )
             }
         }
     }
