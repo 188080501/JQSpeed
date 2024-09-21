@@ -9,23 +9,45 @@ Window {
     visible: true
     color: "#131a24"
 
-    Column {
-        anchors.centerIn: parent
+    Rectangle {
+        id: serverHostContains
+        width: 300
+        height: 85
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -120
+        color: "#00000000"
+        border.width: 2
+        border.color: ( Helper.isConnected ) ? ( "#4CAF50" ) : ( "#9E9E9E" )
+        radius: 10
 
         Text {
-            width: 100
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: 20
             color: "#ffffff"
-            text: "Server: " + Helper.serverHost
+            font.pixelSize: 18
+            text: Helper.serverHost
         }
 
         Text {
-            width: 100
-            color: "#ffffff"
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: 50
+            color: serverHostContains.border.color
+            font.pixelSize: 13
             text: ( Helper.isConnected ) ? ( "Connected" ) : ( "Connecting" )
         }
+    }
+
+    Column {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: serverHostContains.bottom
+        anchors.topMargin: 40
+        spacing: 15
 
         Text {
-            width: 100
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenterOffset: 65
+            width: 220
             color: "#ffffff"
             text: {
                 if ( Helper.isConnected && ( Helper.latency >= 0 ) )
@@ -42,34 +64,61 @@ Window {
                     return "Latency: N/A";
                 }
             }
-        }
 
-        Text {
-            width: 100
-            color: "#ffffff"
-            text: {
-                if ( Helper.isConnected && ( Helper.downloadSpeed >= 0 ) )
-                {
-                    return "Download: " + Helper.downloadSpeed.toFixed( 1 ) + " Mbps";
-                }
-                else
-                {
-                    return "Download: N/A";
-                }
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.left
+                anchors.rightMargin: 16
+                source: "qrc:/images/Latency.png"
             }
         }
 
-        Text {
-            width: 100
-            color: "#ffffff"
-            text: {
-                if ( Helper.isConnected && ( Helper.uploadSpeed >= 0 ) )
-                {
-                    return "Upload: " + Helper.uploadSpeed.toFixed( 1 ) + " Mbps";
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenterOffset: 80
+            spacing: 15
+
+            Text {
+                width: 220
+                color: "#ffffff"
+                text: {
+                    if ( Helper.isConnected && ( Helper.downloadSpeed >= 0 ) )
+                    {
+                        return "Download: " + Helper.downloadSpeed.toFixed( 1 ) + " Mbps";
+                    }
+                    else
+                    {
+                        return "Download: N/A";
+                    }
                 }
-                else
-                {
-                    return "Upload: N/A";
+
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.left
+                    anchors.rightMargin: 16
+                    source: "qrc:/images/Download.png"
+                }
+            }
+
+            Text {
+                width: 220
+                color: "#ffffff"
+                text: {
+                    if ( Helper.isConnected && ( Helper.uploadSpeed >= 0 ) )
+                    {
+                        return "Upload: " + Helper.uploadSpeed.toFixed( 1 ) + " Mbps";
+                    }
+                    else
+                    {
+                        return "Upload: N/A";
+                    }
+                }
+
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.left
+                    anchors.rightMargin: 16
+                    source: "qrc:/images/Upload.png"
                 }
             }
         }
@@ -79,15 +128,39 @@ Window {
            height: 10
         }
 
-        Button {
+        MouseArea {
             anchors.horizontalCenter: parent.horizontalCenter
             width: 100
-            height: 40
-            text: "Test"
+            height: 100
             enabled: Helper.isConnected && !Helper.isMeasuringSpeed
 
             onClicked: {
                 Helper.startMeasureDownloadSpeed();
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                color: "#00000000"
+                border.width: 2
+                radius: 50
+                border.color: {
+                    if ( !enabled ) { return "#9E9E9E"; }
+
+                    if ( Helper.isMeasuringSpeed )
+                    {
+                        return "#FFC107";
+                    }
+                    else
+                    {
+                        return "#4CAF50";
+                    }
+                }
+            }
+
+            Text {
+                anchors.centerIn: parent
+                color: "#ffffff"
+                text: "Test"
             }
         }
     }
@@ -106,7 +179,7 @@ Window {
             Image {
                 width: progressColumn.width
                 height: 10
-                source: "qrc:/images/Download.png"
+                source: "qrc:/images/DownloadProgress.png"
             }
         }
 
@@ -119,7 +192,7 @@ Window {
             Image {
                 width: progressColumn.width
                 height: 10
-                source: "qrc:/images/Upload.png"
+                source: "qrc:/images/UploadProgress.png"
             }
         }
     }
