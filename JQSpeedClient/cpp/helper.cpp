@@ -159,7 +159,7 @@ void Helper::onTextMessageReceived(const QString &message)
         this->setDownloadSpeed( mbitPerSecond );
         this->setDownloadSpeedTestProgress( 1.0f );
 
-        QMetaObject::invokeMethod( this, "startMeasureUploadSpeed", Qt::QueuedConnection );
+        this->startMeasureUploadSpeed();
     }
     else if ( action == "uploadSpeedTest" )
     {
