@@ -146,6 +146,11 @@ Window {
                 border.color: {
                     if ( !enabled ) { return "#9E9E9E"; }
 
+                    if ( !Helper.isConnected )
+                    {
+                        return "#9E9E9E";
+                    }
+
                     if ( Helper.isMeasuringSpeed )
                     {
                         return "#FFC107";
@@ -159,7 +164,7 @@ Window {
 
             Text {
                 anchors.centerIn: parent
-                color: "#ffffff"
+                color: ( Helper.isConnected ) ? ( "#ffffff" ) : ( "#9E9E9E" )
                 text: "Test"
             }
         }
