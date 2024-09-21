@@ -68,14 +68,14 @@ Window {
             Image {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.left
-                anchors.rightMargin: 16
+                anchors.rightMargin: 12
                 source: "qrc:/images/Latency.png"
             }
         }
 
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: 80
+            anchors.horizontalCenterOffset: 60
             spacing: 15
 
             Text {
@@ -95,7 +95,7 @@ Window {
                 Image {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.left
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: 12
                     source: "qrc:/images/Download.png"
                 }
             }
@@ -117,7 +117,7 @@ Window {
                 Image {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.left
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: 12
                     source: "qrc:/images/Upload.png"
                 }
             }
